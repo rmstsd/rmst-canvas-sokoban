@@ -1,0 +1,19 @@
+{
+  "name": "rmst-canvas-sokoban",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@leafer-in/flow": "^1.0.5",
+    "leafer-ui": "^1.0.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3",
+    "vite": "^5.4.8"
+  }
+}

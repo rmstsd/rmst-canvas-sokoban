@@ -2,6 +2,7 @@ import { CellType } from '../type'
 import { calcPositionMap, directionKeyboards } from './position'
 import type { MapData, Position } from '../type'
 import { testMapData } from '../testData'
+import { updateBox, updatePlayer } from '../main'
 
 class SokobanStore {
   mapData: MapData = JSON.parse(JSON.stringify(testMapData))
@@ -116,12 +117,14 @@ class SokobanStore {
 
       nextBox.x = nextNextPosition.x
       nextBox.y = nextNextPosition.y
+      updateBox(nextBox)
     }
 
     mapData.player = nextPosition
+    updatePlayer()
 
     if (this.isWon()) {
-      console.log('win')
+      console.log('won')
     }
   }
 }

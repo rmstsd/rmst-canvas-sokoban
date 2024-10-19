@@ -1,4 +1,5 @@
 export interface Position {
+  id: string
   x: number
   y: number
 }
@@ -12,7 +13,7 @@ export enum CellType {
 }
 
 export interface MapData {
-  bgMap: CellType[][]
+  bgMap: { id: string; type: CellType }[][]
   player: Position
   boxes: Position[]
   targets: Position[]

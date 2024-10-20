@@ -105,56 +105,53 @@ class GameStore {
       height: cellSize
     })
 
-    const body = new Flow({
-      flow: 'y',
+    const playZoneUi = new Box({ children: [bgMapUi, ...targetsUi, ...boxesUi, playerUi] })
+
+    const ctrlUi = new Flow({
+      x: 100,
+      y: 100,
       children: [
-        new Box({ children: [bgMapUi, ...targetsUi, ...boxesUi, playerUi] }),
-        new Flow({
+        new Box({
+          id: 'prev-level',
           x: 100,
           y: 100,
-          children: [
-            new Box({
-              id: 'prev-level',
-              x: 100,
-              y: 100,
-              fill: '#FF4B4B',
-              cornerRadius: 20,
-              children: [{ tag: 'Text', text: '上一关', fill: 'black', padding: [10, 20] }],
-              event: {
-                [PointerEvent.CLICK]: () => {
-                  const prevLevel = this.level - 1
-                  if (prevLevel >= 0) {
-                    this.level = prevLevel
-                    this.gameMap = new GameMap(this.gameLevels[this.level])
-                    this.renderGame()
-                  }
-                }
+          fill: '#FF4B4B',
+          cornerRadius: 20,
+          children: [{ tag: 'Text', text: '上一关', fill: 'black', padding: [10, 20] }],
+          event: {
+            [PointerEvent.CLICK]: () => {
+              const prevLevel = this.level - 1
+              if (prevLevel >= 0) {
+                this.level = prevLevel
+                this.gameMap = new GameMap(this.gameLevels[this.level])
+                this.renderGame()
               }
-            }),
-            { id: 'level', tag: 'Text', fontSize: 16, text: String(this.level + 1), fill: 'black', padding: [10, 20] },
-            new Box({
-              id: 'next-level',
-              x: 100,
-              y: 100,
-              fill: '#FF4B4B',
-              cornerRadius: 20,
-              children: [{ tag: 'Text', text: '下一关', fill: 'black', padding: [10, 20] }],
-              event: {
-                [PointerEvent.CLICK]: () => {
-                  const nextLevel = this.level + 1
-                  if (nextLevel < this.gameLevels.length) {
-                    this.level = nextLevel
-                    this.gameMap = new GameMap(this.gameLevels[this.level])
-                    this.renderGame()
-                  }
-                }
+            }
+          }
+        }),
+        { id: 'level', tag: 'Text', fontSize: 16, text: String(this.level + 1), fill: 'black', padding: [10, 20] },
+        new Box({
+          id: 'next-level',
+          x: 100,
+          y: 100,
+          fill: '#FF4B4B',
+          cornerRadius: 20,
+          children: [{ tag: 'Text', text: '下一关', fill: 'black', padding: [10, 20] }],
+          event: {
+            [PointerEvent.CLICK]: () => {
+              const nextLevel = this.level + 1
+              if (nextLevel < this.gameLevels.length) {
+                this.level = nextLevel
+                this.gameMap = new GameMap(this.gameLevels[this.level])
+                this.renderGame()
               }
-            })
-          ]
+            }
+          }
         })
       ]
     })
 
+    const body = new Flow({ flow: 'y', children: [playZoneUi, ctrlUi] })
     leafer.add(body)
   }
 

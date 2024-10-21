@@ -199,3 +199,5 @@ class GameStore {
 }
 
 export default GameStore
+
+export const gameStore = new GameStore()

@@ -13,7 +13,7 @@ class Controller {
     // this.view.bindCallback('itemRemove', item => this.removeItem(item.id))
     this.view.bindCallback('itemToggle', item => this.toggleComplete(item.id, item.completed))
     // this.view.bindCallback('removeCompleted', () => this.removeCompletedItems())
-    this.view.bindCallback('toggleAll', status => this.toggleAll(status.completed))
+    this.view.bindCallback('toggleAll', completed => this.toggleAll(completed))
   }
 
   model: Model

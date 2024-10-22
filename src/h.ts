@@ -1,8 +1,12 @@
 import { Flow } from '@leafer-in/flow'
 import { Rect, Box, Image, IUI, Text, Group } from 'leafer-ui'
 
-const h = (...rest): IUI => {
+const h = (...rest) => {
   const [LeaferClassOrCustomFunction, props, ...children] = rest
+
+  if (typeof LeaferClassOrCustomFunction === 'string') {
+    return LeaferClassOrCustomFunction
+  }
 
   const innerProps = { ...props, children: children.flat().filter(Boolean) }
 

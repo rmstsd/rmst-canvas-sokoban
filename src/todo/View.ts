@@ -90,7 +90,9 @@ class View {
 
       case 'elementComplete': {
         console.log(parameter)
-        qs(`[data-id="${parameter.id}"]`).classList.toggle('completed')
+        const listItem = qs(`[data-id="${parameter.id}"]`)
+        listItem.classList.toggle('completed')
+        qs('input', listItem).checked = parameter.completed
         break
       }
       default: {

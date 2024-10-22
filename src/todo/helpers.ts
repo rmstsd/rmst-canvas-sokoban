@@ -1,9 +1,9 @@
 // Get element(s) by CSS selector:
-const qs = (selector: string, scope?: HTMLElement) => {
+const qs = (selector: string, scope?: Element) => {
   return (scope || document).querySelector(selector)
 }
 
-const qsa = (selector: string, scope?: HTMLElement) => {
+const qsa = (selector: string, scope?: Element) => {
   return Array.from((scope || document).querySelectorAll(selector))
 }
 

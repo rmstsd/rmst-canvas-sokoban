@@ -53,6 +53,14 @@ class Controller {
 
   toggleAll(completed: boolean) {
     console.log('all', completed)
+
+    this.model.read({ completed: !completed }, data => {
+      for (let item of data) {
+        this.toggleComplete(item.id, completed, true)
+      }
+
+      this._filter()
+    })
   }
 
   toggleComplete(id: number, completed: boolean, silent?) {
@@ -61,7 +69,9 @@ class Controller {
     this.model.update(id, { completed })
     this.view.render('elementComplete', { id, completed })
 
-    if (!silent) this._filter()
+    if (!silent) {
+      this._filter()
+    }
   }
 
   showAll() {

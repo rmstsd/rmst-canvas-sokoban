@@ -1,7 +1,14 @@
-import { Leafer } from 'leafer-ui'
-import App from './App'
-import { gameStore } from './store/store'
+import { Group, Leafer, Rect } from 'leafer-ui'
 
-const leafer = new Leafer({ view: document.querySelector('#root') })
-leafer.add(<App />)
-gameStore.leafer = leafer
+import './todo'
+// import App from './App'
+// import { gameStore } from './store/store'
+
+// const app = <App />
+
+// const leafer = new Leafer({ view: document.querySelector('#root') })
+
+// if (app) {
+//   leafer.add(app)
+// }
+// gameStore.leafer = leafer

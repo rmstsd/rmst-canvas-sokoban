@@ -1,4 +1,4 @@
-import { testMapData } from '@/testData'
+import { createEmptyMap, testMapData } from '@/testData'
 import { CellType, MapData } from '@/type'
 
 class Edit {
@@ -7,12 +7,13 @@ class Edit {
   }
 
   cellType: CellType = CellType.Floor
-  mapData: MapData = structuredClone(testMapData) as MapData
+  mapData: MapData = structuredClone(createEmptyMap()) as MapData
 
   addCell = (rowIndex: number, colIndex: number) => {
     const { mapData, cellType } = this
 
     const fillCell = (value: CellType) => {
+      mapData.bgMap[rowIndex][colIndex] ??= { id: crypto.randomUUID(), type: CellType.Floor }
       mapData.bgMap[rowIndex][colIndex].type = value
     }
 

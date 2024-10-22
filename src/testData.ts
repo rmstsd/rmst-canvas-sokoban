@@ -1507,3 +1507,10 @@ export const gameLevels = [
     ]
   }
 ]
+
+export const createEmptyMap = () => ({
+  bgMap: Array.from({ length: 10 }, row => Array.from({ length: 10 }, () => null)),
+  player: {},
+  boxes: [],
+  targets: []
+})

@@ -11,9 +11,9 @@ class Controller {
     // this.view.bindCallback('itemEditDone', item => this.editItemSave(item.id, item.title))
     // this.view.bindCallback('itemEditCancel', item => this.editItemCancel(item.id))
     // this.view.bindCallback('itemRemove', item => this.removeItem(item.id))
-    // this.view.bindCallback('itemToggle', item => this.toggleComplete(item.id, item.completed))
+    this.view.bindCallback('itemToggle', item => this.toggleComplete(item.id, item.completed))
     // this.view.bindCallback('removeCompleted', () => this.removeCompletedItems())
-    // this.view.bindCallback('toggleAll', status => this.toggleAll(status.completed))
+    this.view.bindCallback('toggleAll', status => this.toggleAll(status.completed))
   }
 
   model: Model
@@ -41,8 +41,9 @@ class Controller {
   }
 
   addItem(title: string) {
-    console.log(title)
-    if (title.trim() === '') return
+    if (title.trim() === '') {
+      return
+    }
 
     this.model.create(title)
 
@@ -50,23 +51,27 @@ class Controller {
     this._filter(true)
   }
 
-  /**
-   * Event fires on load. Gets all items & displays them
-   */
-  showAll() {
-    this.model.read(data => this.view.render('showEntries', data))
+  toggleAll(completed: boolean) {
+    console.log('all', completed)
   }
 
-  /**
-   * Renders all active tasks
-   */
+  toggleComplete(id: number, completed: boolean, silent?) {
+    console.log(id, completed)
+
+    this.model.update(id, { completed })
+    this.view.render('elementComplete', { id, completed })
+
+    if (!silent) this._filter()
+  }
+
+  showAll() {
+    this.model.read({}, data => this.view.render('showEntries', data))
+  }
+
   showActive() {
     this.model.read({ completed: false }, data => this.view.render('showEntries', data))
   }
 
-  /**
-   * Renders all completed tasks
-   */
   showCompleted() {
     this.model.read({ completed: true }, data => this.view.render('showEntries', data))
   }
@@ -78,11 +83,8 @@ class Controller {
     // Update the elements on the page, which change with each completed todo
     this._updateCount()
 
-    // If the last active route isn't "All", or we're switching routes, we
-    // re-create the todo item elements, calling:
-    //   this.show[All|Active|Completed]()
+    // If the last active route isn't "All", or we're switching routes, we re-create the todo item elements, calling: this.show[All|Active|Completed]()
     if (force || this._lastActiveRoute !== 'All' || this._lastActiveRoute !== activeRoute) {
-      console.log(activeRoute)
       this[`show${activeRoute}`]()
     }
 

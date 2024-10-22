@@ -1,44 +1,80 @@
-import Store from './Store'
+interface Todo {
+  id?: string
+  title: string
+  completed: boolean
+}
 
 class Model {
-  constructor(storage: Store) {
-    this.storage = storage
-  }
+  constructor() {}
 
-  storage: Store
+  todoList: Todo[] = [
+    {
+      title: 'asd',
+      completed: false,
+      id: 'dfdfgfg'
+    }
+  ]
 
   create(title: string) {
     const newItem = { title, completed: false }
-    this.storage.save(newItem)
+
+    this.save(newItem)
+  }
+
+  update(id, { completed }) {
+    const item = this.todoList.find(todo => todo.id === id)
+    item.completed = completed
   }
 
   getCount() {
     const stats = { active: 0, completed: 0, total: 0 }
 
-    this.storage.findAll(data => {
-      for (let todo of data) {
-        if (todo.completed) stats.completed++
-        else stats.active++
+    for (let todo of this.todoList) {
+      if (todo.completed) stats.completed++
+      else stats.active++
 
-        stats.total++
-      }
-    })
+      stats.total++
+    }
 
     return stats
   }
 
-  read(query, callback?) {
+  read(query, callback) {
     const queryType = typeof query
 
     if (queryType === 'function') {
       callback = query
-      this.storage.findAll(callback)
+      callback(this.todoList)
     } else if (queryType === 'string' || queryType === 'number') {
       query = parseInt(query, 10)
-      this.storage.find({ id: query }, callback)
+      this.find({ id: query }, callback)
     } else {
-      this.storage.find(query, callback)
+      this.find(query, callback)
     }
+  }
+
+  private save(updateData: Todo) {
+    if (!updateData.id) {
+      updateData.id = crypto.randomUUID()
+
+      this.todoList.push(updateData)
+    }
+
+    console.log('Todo saved', this.todoList)
+  }
+
+  private find(query, callback) {
+    if (!callback) return
+
+    callback(
+      this.todoList.filter(todo => {
+        for (let q in query) {
+          if (query[q] !== todo[q]) return false
+        }
+
+        return true
+      })
+    )
   }
 }
 

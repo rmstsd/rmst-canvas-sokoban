@@ -1,6 +1,6 @@
 .todoapp {
   padding: 30px;
-  width: 300px;
+  width: 500px;
 
   .new-todo {
     padding: 4px;
@@ -17,15 +17,33 @@
           margin-left: auto;
         }
       }
+
+      &.completed {
+        label {
+          text-decoration: line-through;
+          color: #999;
+        }
+      }
     }
+  }
+
+  .toggle-all-label {
+    margin-top: 10px;
+  }
+  .toggle-all-label:hover {
+    background-color: #eee;
   }
 
   .footer {
     display: flex;
+    align-items: center;
+    gap: 10px;
 
     .filters {
       display: flex;
       gap: 10px;
+      padding-inline-start: 0;
+
       li {
         list-style-type: none;
       }

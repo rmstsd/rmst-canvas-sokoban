@@ -1,8 +1,6 @@
 import Model from './Model'
 import View from './View'
 
-export type FilterType = 'All' | 'Active' | 'Completed'
-
 class Controller {
   constructor(model, view) {
     this.model = model

@@ -12,3 +12,20 @@ export function findById(iui: IUI, id: string): IUI {
     }
   }
 }
+
+export function uuid() {
+  return crypto.randomUUID()
+}
+
+export function closestById(el: IUI, id: string) {
+  let p = el
+  while (p) {
+    if (p.id === id) {
+      return p
+    }
+
+    p = p.parent
+  }
+
+  return null
+}

@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@leafer-in/flow": "^1.0.5",
+    "@leafer-in/flow": "^1.0.7",
     "jquery": "^3.7.1",
-    "leafer-ui": "^1.0.5"
+    "leafer-ui": "^1.0.7"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.32",

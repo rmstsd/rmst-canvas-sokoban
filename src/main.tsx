@@ -1,6 +1,9 @@
 import { Group, Leafer, Rect } from 'leafer-ui'
+import { Flow } from '@leafer-in/flow'
 
-import './todoMvc'
+// import './todoMvc'
+import './todoCanvas'
+
 // import App from './App'
 // import { gameStore } from './store/store'
 
@@ -11,4 +14,7 @@ import './todoMvc'
 // if (app) {
 //   leafer.add(app)
 // }
-// gameStore.leafer = leafer
+
+// const p = new Flow({ width: 100, height: 100, fill: 'red', cursor: 'pointer', children: [] })
+// leafer.add(p)
+// console.log(p.findId('asd'))

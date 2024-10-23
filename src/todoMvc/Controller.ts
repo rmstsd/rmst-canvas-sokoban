@@ -9,11 +9,8 @@ class Controller {
     this.view = view
 
     this.view.bindCallback('newTodo', title => this.addItem(title))
-    // this.view.bindCallback('itemEdit', item => this.editItem(item.id))
-    // this.view.bindCallback('itemEditDone', item => this.editItemSave(item.id, item.title))
-    // this.view.bindCallback('itemEditCancel', item => this.editItemCancel(item.id))
     this.view.bindCallback('itemRemove', item => this.removeItem(item.id))
-    this.view.bindCallback('itemToggle', item => this.toggleComplete(item.id, item.completed))
+    this.view.bindCallback('itemToggle', item => this.toggleItem(item.id, item.completed))
     this.view.bindCallback('removeCompleted', () => this.removeCompletedItems())
     this.view.bindCallback('toggleAll', completed => this.toggleAll(completed))
     this.view.bindCallback('filterBtn', (type: FilterType) => this.setFilterType(type))
@@ -25,10 +22,8 @@ class Controller {
   filterType: FilterType
   setFilterType(type: FilterType) {
     this.filterType = type
-
-    this._filter()
-
     this.view.renderFilterTypeBtn(type)
+    this._filter()
   }
 
   addItem(title: string) {
@@ -45,20 +40,18 @@ class Controller {
   toggleAll(completed: boolean) {
     this.model.read({ completed: !completed }, data => {
       for (let item of data) {
-        this.toggleComplete(item.id, completed, true)
+        this.toggleItem(item.id, completed, true)
       }
 
       this._filter()
     })
   }
 
-  toggleComplete(id: number, completed: boolean, silent?) {
+  toggleItem(id: number, completed: boolean, silent?) {
     this.model.update(id, { completed })
     this.view.renderElementComplete({ id, completed })
 
-    if (!silent) {
-      this._filter()
-    }
+    this._updateCount()
   }
 
   removeCompletedItems() {
@@ -72,22 +65,23 @@ class Controller {
     this._filter()
   }
 
-  showAll() {
-    this.model.read({}, data => this.view.render('showEntries', data))
-  }
+  showList(filterType: FilterType) {
+    let p
+    if (filterType === 'All') {
+      p = {}
+    } else if (filterType === 'Active') {
+      p = { completed: false }
+    } else if (filterType === 'Completed') {
+      p = { completed: true }
+    }
 
-  showActive() {
-    this.model.read({ completed: false }, data => this.view.render('showEntries', data))
-  }
-
-  showCompleted() {
-    this.model.read({ completed: true }, data => this.view.render('showEntries', data))
+    this.model.read(p, data => this.view.render('showEntries', data))
   }
 
   _filter() {
     this._updateCount()
-    console.log(this.filterType)
-    this[`show${this.filterType}`]()
+
+    this.showList(this.filterType)
   }
 
   _updateCount() {
@@ -97,7 +91,7 @@ class Controller {
     const visible = completed > 0
     const checked = completed === todos.total
 
-    this.view.render('updateElementCount', todos.active)
+    this.view.renderLeftCount(todos.active)
     this.view.render('clearCompletedButton', { completed, visible })
     this.view.render('toggleAll', { checked })
     this.view.render('contentBlockVisibility', { visible: todos.total > 0 })

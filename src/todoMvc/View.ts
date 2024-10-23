@@ -1,6 +1,8 @@
 import { FilterType } from './Controller'
 import { $delegate, $on, qs, qsa } from './helpers'
 
+import $, { noop } from 'jquery'
+
 class View {
   constructor(root: Element) {
     this.root = root
@@ -42,7 +44,9 @@ class View {
     this.$footer = this.qs('.footer') as HTMLElement
     this.$toggleAllInput = this.qs('.toggle-all') as HTMLInputElement
     this.$toggleAllLabel = this.qs('.toggle-all-label') as HTMLLabelElement
-    this.$newTodo = this.qs('.new-todo') as HTMLInputElement
+    this.$newTodoInput = this.qs('.new-todo') as HTMLInputElement
+
+    this.on()
   }
 
   qs = (selector: string) => qs(selector, this.root)
@@ -57,60 +61,48 @@ class View {
   $footer: HTMLElement
   $toggleAllInput: HTMLInputElement
   $toggleAllLabel: HTMLLabelElement
-  $newTodo: HTMLInputElement
+  $newTodoInput: HTMLInputElement
+
+  evtMap = {}
+
+  invoke(evtName, p?) {
+    const func = this.evtMap[evtName] ?? noop
+    func(p)
+  }
+
+  on() {
+    $(this.$newTodoInput).on('change', () => this.invoke('newTodo', this.$newTodoInput.value))
+
+    $(this.$todoList).on('click', '.toggle', e => {
+      const target: HTMLInputElement = e.target
+      const item = target.closest(`[data-id]`)
+
+      this.invoke('itemToggle', { id: item.getAttribute(`data-id`), completed: e.target.checked })
+    })
+
+    $('.filter-btn').on('click', evt => {
+      this.invoke('filterBtn', evt.target.id)
+    })
+
+    $(this.$toggleAllLabel).on('click', evt => {
+      if (evt.target.tagName === 'LABEL') {
+        return
+      }
+
+      this.invoke('toggleAll', this.$toggleAllInput.checked)
+    })
+
+    $on(this.$clearCompleted, 'click', () => this.invoke('removeCompleted'))
+
+    $(this.$todoList).on('click', '.destroy', evt => {
+      const target: HTMLInputElement = evt.target
+      const item = target.closest(`[data-id]`)
+      this.invoke('itemRemove', { id: item.getAttribute(`data-id`) })
+    })
+  }
 
   bindCallback(evt: string, handler: Function) {
-    switch (evt) {
-      case 'newTodo': {
-        $on(this.$newTodo, 'change', () => handler(this.$newTodo.value))
-        break
-      }
-      case 'itemToggle': {
-        $delegate(this.$todoList, '.toggle', 'click', e => {
-          const target: HTMLInputElement = e.target
-          const item = target.closest(`[data-id]`)
-          handler({ id: item.getAttribute(`data-id`), completed: e.target.checked })
-        })
-        break
-      }
-
-      case 'toggleAll': {
-        $on(this.$toggleAllLabel, 'click', evt => {
-          if (evt.target.tagName === 'LABEL') {
-            return
-          }
-          // 点 label 时候会触发两次
-          handler(this.$toggleAllInput.checked)
-        })
-        break
-      }
-
-      case 'removeCompleted': {
-        $on(this.$clearCompleted, 'click', () => handler())
-        break
-      }
-
-      case 'filterBtn': {
-        qsa('.filter-btn').forEach(item => {
-          $on(item, 'click', evt => {
-            handler(evt.target.id)
-          })
-        })
-        break
-      }
-      case 'itemRemove': {
-        $delegate(this.$todoList, '.destroy', 'click', e => {
-          const target: HTMLInputElement = e.target
-          const item = target.closest(`[data-id]`)
-          handler({ id: item.getAttribute(`data-id`) })
-        })
-        break
-      }
-
-      default: {
-        break
-      }
-    }
+    this.evtMap[evt] = handler
   }
 
   render(viewCmd, parameter?) {
@@ -120,13 +112,10 @@ class View {
         break
       }
       case 'clearNewTodo': {
-        this.$newTodo.value = ''
+        this.$newTodoInput.value = ''
         break
       }
-      case 'updateElementCount': {
-        this.$todoItemCounter.innerHTML = itemCounter(parameter)
-        break
-      }
+
       case 'clearCompletedButton': {
         this.$clearCompleted.innerHTML = clearCompletedButton(parameter.completed)
         this.$clearCompleted.style.display = parameter.visible ? 'block' : 'none'
@@ -147,13 +136,18 @@ class View {
     }
   }
 
+  renderLeftCount(parameter) {
+    this.$todoItemCounter.innerHTML = itemCounter(parameter)
+  }
+
   renderElementComplete(parameter) {
     const listItem = this.qs(`[data-id="${parameter.id}"]`)
+
     if (!listItem) {
       return
     }
     listItem.classList.toggle('completed')
-    this.qs('input', listItem).checked = parameter.completed
+    qs('input', listItem).checked = parameter.completed
   }
 
   renderFilterTypeBtn(filterType: FilterType) {

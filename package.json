@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@leafer-in/flow": "^1.0.5",
+    "jquery": "^3.7.1",
     "leafer-ui": "^1.0.5"
   },
   "devDependencies": {
+    "@types/jquery": "^3.5.32",
     "@types/node": "^22.7.7",
     "less": "^4.2.0",
     "path": "^0.12.7",

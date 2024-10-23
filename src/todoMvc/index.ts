@@ -5,9 +5,9 @@ import Model from './Model'
 import View from './View'
 
 class Todo {
-  constructor() {
+  constructor(root: Element) {
     this.model = new Model()
-    this.view = new View()
+    this.view = new View(root)
     this.controller = new Controller(this.model, this.view)
   }
 
@@ -16,16 +16,9 @@ class Todo {
   controller: Controller
 }
 
-let todo: Todo
-
-const onHashChange = () => {
-  todo.controller.setView(document.location.hash)
-}
-
 const onLoad = () => {
-  todo = new Todo()
-  onHashChange()
+  const todo = new Todo(document.querySelector('#root'))
+  todo.controller.setFilterType('All')
 }
 
 window.addEventListener('load', onLoad)
-window.addEventListener('hashchange', onHashChange)

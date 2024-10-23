@@ -1,25 +1,54 @@
-import { $delegate, $on, qs } from './helpers'
+import { FilterType } from './Controller'
+import { $delegate, $on, qs, qsa } from './helpers'
 
 class View {
-  constructor() {
+  constructor(root: Element) {
+    this.root = root
     const initialHtml = `
-    <section class="todoapp" style="padding: 30px;"><header class="header"><h1>todos</h1><input class="new-todo" placeholder="What needs to be done?" autofocus=""></header><main class="main" style="display: none;">
-        <label class="toggle-all-label"><input class="toggle-all" type="checkbox">使所有已完成</label>
-      <ul class="todo-list">
-      </ul></main><footer class="footer" style="display: none;"><span class="todo-count"><strong>0</strong> items left</span><ul class="filters"><li><a href="#/" class="selected">All</a></li><li><a href="#/active">Active</a></li><li><a href="#/completed">Completed</a></li></ul><button class="clear-completed" style="display: none;"></button></footer></section>
+      <section class="todoapp" style="padding: 30px">
+        <header class="header">
+          <input class="new-todo" placeholder="What needs to be done?" autofocus="" />
+
+          <footer class="footer" style="display: none">
+            <span class="todo-count">
+              <strong>0</strong>
+              items left
+            </span>
+            <ul class="filters">
+              <li><button id="All" class="filter-btn">All</button></li>
+              <li><button id="Active" class="filter-btn">Active</button></li>
+              <li><button id="Completed" class="filter-btn">Completed</button></li>
+            </ul>
+            <button class="clear-completed" style="display: none"></button>
+          </footer>
+        </header>
+        <main class="main" style="display: none">
+          <label class="toggle-all-label">
+            <input class="toggle-all" type="checkbox" />
+            使所有已完成
+          </label>
+          <ul class="todo-list"></ul>
+        </main>
+        
+      </section>
     `
 
-    document.querySelector('#root').innerHTML = initialHtml
+    this.root.innerHTML = initialHtml
 
-    this.$todoList = qs('.todo-list') as HTMLElement
-    this.$todoItemCounter = qs('.todo-count') as HTMLElement
-    this.$clearCompleted = qs('.clear-completed') as HTMLElement
-    this.$main = qs('.main') as HTMLElement
-    this.$footer = qs('.footer') as HTMLElement
-    this.$toggleAllInput = qs('.toggle-all') as HTMLInputElement
-    this.$toggleAllLabel = qs('.toggle-all-label') as HTMLLabelElement
-    this.$newTodo = qs('.new-todo') as HTMLInputElement
+    this.$todoList = this.qs('.todo-list') as HTMLElement
+    this.$todoItemCounter = this.qs('.todo-count') as HTMLElement
+    this.$clearCompleted = this.qs('.clear-completed') as HTMLElement
+    this.$main = this.qs('.main') as HTMLElement
+    this.$footer = this.qs('.footer') as HTMLElement
+    this.$toggleAllInput = this.qs('.toggle-all') as HTMLInputElement
+    this.$toggleAllLabel = this.qs('.toggle-all-label') as HTMLLabelElement
+    this.$newTodo = this.qs('.new-todo') as HTMLInputElement
   }
+
+  qs = (selector: string) => qs(selector, this.root)
+  qsa = (selector: string) => qsa(selector, this.root)
+
+  root: Element
 
   $todoList: HTMLElement
   $todoItemCounter: HTMLElement
@@ -46,10 +75,34 @@ class View {
       }
 
       case 'toggleAll': {
-        console.log(this.$toggleAllLabel)
         $on(this.$toggleAllLabel, 'click', evt => {
+          if (evt.target.tagName === 'LABEL') {
+            return
+          }
           // 点 label 时候会触发两次
           handler(this.$toggleAllInput.checked)
+        })
+        break
+      }
+
+      case 'removeCompleted': {
+        $on(this.$clearCompleted, 'click', () => handler())
+        break
+      }
+
+      case 'filterBtn': {
+        qsa('.filter-btn').forEach(item => {
+          $on(item, 'click', evt => {
+            handler(evt.target.id)
+          })
+        })
+        break
+      }
+      case 'itemRemove': {
+        $delegate(this.$todoList, '.destroy', 'click', e => {
+          const target: HTMLInputElement = e.target
+          const item = target.closest(`[data-id]`)
+          handler({ id: item.getAttribute(`data-id`) })
         })
         break
       }
@@ -88,17 +141,24 @@ class View {
         break
       }
 
-      case 'elementComplete': {
-        console.log(parameter)
-        const listItem = qs(`[data-id="${parameter.id}"]`)
-        listItem.classList.toggle('completed')
-        qs('input', listItem).checked = parameter.completed
-        break
-      }
       default: {
         break
       }
     }
+  }
+
+  renderElementComplete(parameter) {
+    const listItem = this.qs(`[data-id="${parameter.id}"]`)
+    if (!listItem) {
+      return
+    }
+    listItem.classList.toggle('completed')
+    this.qs('input', listItem).checked = parameter.completed
+  }
+
+  renderFilterTypeBtn(filterType: FilterType) {
+    this.qsa('.filter-btn').forEach(btn => btn.classList.remove('selected'))
+    this.qs(`#${filterType}`).classList.add('selected')
   }
 }
 
@@ -133,6 +193,7 @@ const createTodoItem = ({ id, title, completed, checked, index }) => `
         <input class="toggle" type="checkbox" ${checked}>
         <label>${title}</label>
         <button class="destroy">x</button>
+        <button class="edit">编辑</button>
     </div>
 </li>
 `

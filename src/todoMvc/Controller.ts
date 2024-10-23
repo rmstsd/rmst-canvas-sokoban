@@ -1,6 +1,8 @@
 import Model from './Model'
 import View from './View'
 
+export type FilterType = 'All' | 'Active' | 'Completed'
+
 class Controller {
   constructor(model, view) {
     this.model = model
@@ -10,34 +12,23 @@ class Controller {
     // this.view.bindCallback('itemEdit', item => this.editItem(item.id))
     // this.view.bindCallback('itemEditDone', item => this.editItemSave(item.id, item.title))
     // this.view.bindCallback('itemEditCancel', item => this.editItemCancel(item.id))
-    // this.view.bindCallback('itemRemove', item => this.removeItem(item.id))
+    this.view.bindCallback('itemRemove', item => this.removeItem(item.id))
     this.view.bindCallback('itemToggle', item => this.toggleComplete(item.id, item.completed))
-    // this.view.bindCallback('removeCompleted', () => this.removeCompletedItems())
+    this.view.bindCallback('removeCompleted', () => this.removeCompletedItems())
     this.view.bindCallback('toggleAll', completed => this.toggleAll(completed))
+    this.view.bindCallback('filterBtn', (type: FilterType) => this.setFilterType(type))
   }
 
   model: Model
   view: View
 
-  _activeRoute
-  _lastActiveRoute
-
-  setView(hash: string) {
-    const route = hash.split('/')[1]
-    const page = route || ''
-    this._updateFilter(page)
-  }
-
-  _updateFilter(currentPage) {
-    // Store a reference to the active route, allowing us to re-filter todo
-    // items as they are marked complete or incomplete.
-    this._activeRoute = currentPage
-
-    if (currentPage === '') this._activeRoute = 'All'
+  filterType: FilterType
+  setFilterType(type: FilterType) {
+    this.filterType = type
 
     this._filter()
 
-    this.view.render('setFilter', currentPage)
+    this.view.renderFilterTypeBtn(type)
   }
 
   addItem(title: string) {
@@ -48,12 +39,10 @@ class Controller {
     this.model.create(title)
 
     this.view.render('clearNewTodo')
-    this._filter(true)
+    this._filter()
   }
 
   toggleAll(completed: boolean) {
-    console.log('all', completed)
-
     this.model.read({ completed: !completed }, data => {
       for (let item of data) {
         this.toggleComplete(item.id, completed, true)
@@ -64,14 +53,23 @@ class Controller {
   }
 
   toggleComplete(id: number, completed: boolean, silent?) {
-    console.log(id, completed)
-
     this.model.update(id, { completed })
-    this.view.render('elementComplete', { id, completed })
+    this.view.renderElementComplete({ id, completed })
 
     if (!silent) {
       this._filter()
     }
+  }
+
+  removeCompletedItems() {
+    this.model.todoList = this.model.todoList.filter(item => !item.completed)
+
+    this._filter()
+  }
+
+  removeItem(id: string) {
+    this.model.todoList = this.model.todoList.filter(item => item.id !== id)
+    this._filter()
   }
 
   showAll() {
@@ -86,19 +84,10 @@ class Controller {
     this.model.read({ completed: true }, data => this.view.render('showEntries', data))
   }
 
-  _filter(force?) {
-    const active = this._activeRoute
-    const activeRoute = active.charAt(0).toUpperCase() + active.substr(1)
-
-    // Update the elements on the page, which change with each completed todo
+  _filter() {
     this._updateCount()
-
-    // If the last active route isn't "All", or we're switching routes, we re-create the todo item elements, calling: this.show[All|Active|Completed]()
-    if (force || this._lastActiveRoute !== 'All' || this._lastActiveRoute !== activeRoute) {
-      this[`show${activeRoute}`]()
-    }
-
-    this._lastActiveRoute = activeRoute
+    console.log(this.filterType)
+    this[`show${this.filterType}`]()
   }
 
   _updateCount() {

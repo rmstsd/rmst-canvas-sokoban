@@ -1,6 +1,6 @@
 import { Group, Leafer, Rect } from 'leafer-ui'
 
-import './todo'
+import './todoMvc'
 // import App from './App'
 // import { gameStore } from './store/store'
 

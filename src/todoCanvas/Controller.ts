@@ -8,11 +8,13 @@ class Controller {
     view.on(Event_Type.removeItem, this.removeItem.bind(this))
 
     view.on(Event_Type.toggleCheckAll, this.doneAll.bind(this))
+    view.on(Event_Type.filterBtn, this.setFilterType.bind(this))
   }
 
-  filterType: FilterType = 'All'
+  filterType: FilterType = 'all'
 
   setFilterType(type: FilterType) {
+    console.log('filterType', type)
     this.filterType = type
     this.filter()
   }
@@ -45,7 +47,14 @@ class Controller {
   }
 
   filter() {
-    const filteredTodoList = this.model.todoList.filter(todo => true)
+    let filteredTodoList: Todo[]
+    if (this.filterType === 'all') {
+      filteredTodoList = this.model.todoList
+    } else if (this.filterType === 'done') {
+      filteredTodoList = this.model.todoList.filter(item => item.done)
+    } else if (this.filterType === 'undone') {
+      filteredTodoList = this.model.todoList.filter(item => !item.done)
+    }
 
     this.handleCheckAll()
     this.view.renderList(filteredTodoList)

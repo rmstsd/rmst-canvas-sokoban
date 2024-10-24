@@ -3,4 +3,4 @@ interface Todo {
   content: string
   done: boolean
 }
-type FilterType = 'All' | 'Active' | 'Completed'
+type FilterType = 'all' | 'undone' | 'done'

@@ -20,4 +20,4 @@ const todo = new Todo(root)
 
 console.log(todo)
 
-todo.controller.setFilterType('All')
+todo.controller.setFilterType('all')

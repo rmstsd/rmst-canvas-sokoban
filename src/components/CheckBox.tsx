@@ -32,7 +32,7 @@ export default function CheckBox(props: CheckBoxProps) {
   ui.data = { update, value: defaultValue }
 
   update(ui.data.value)
-  function update(bool) {
+  function update(bool: boolean) {
     ui.data.value = bool
     ui.removeAll()
 

@@ -4,17 +4,21 @@ interface ButtonProps {
   onClick?: () => void
   children?: Leafer
   id?: string
+  className?: string
+  stroke?: string
 }
 
 export default function Button(props: ButtonProps) {
-  const { id, onClick, children } = props
+  const { id, className, onClick, stroke, children } = props
 
-  return (
+  const ui: Box = (
     <Box
       id={id}
+      className={className}
       x={100}
       y={100}
       fill="#0264dc"
+      stroke={stroke}
       cornerRadius={20}
       event={{ [PointerEvent.CLICK]: onClick }}
       cursor="pointer"
@@ -22,4 +26,12 @@ export default function Button(props: ButtonProps) {
       <Text text={children} fill="white" padding={[10, 20]} />
     </Box>
   )
+
+  ui.data = {}
+
+  function update(p) {
+    ui.set(p)
+  }
+
+  return ui
 }

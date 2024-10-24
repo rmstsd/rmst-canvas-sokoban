@@ -10,7 +10,8 @@ export enum Event_Type {
   removeItem = 'removeItem',
   toggleCheckItem = 'toggleCheckItem',
 
-  toggleCheckAll = 'toggleCheckAll'
+  toggleCheckAll = 'toggleCheckAll',
+  filterBtn = 'filterBtn'
 }
 
 class View extends MyEventTarget {
@@ -22,6 +23,8 @@ class View extends MyEventTarget {
     const App = () => {
       const checkAll = <CheckBox onChange={bool => this.emit(Event_Type.toggleCheckAll, bool)} />
       this.checkAll = checkAll
+      const remain = <Text text="剩余 3 个"></Text>
+      this.remain = remain
 
       return (
         <Flow flow="y" padding={30}>
@@ -32,10 +35,17 @@ class View extends MyEventTarget {
 
             <Flow flowAlign="center" gap={10}>
               {checkAll}
-              <Text text="剩余 3 个"></Text>
-              <Button>所有</Button>
-              <Button>未完成</Button>
-              <Button>已完成</Button>
+              <Text text="使所有都完成 | "></Text>
+              {remain}
+              <Button id="all" className="filterBtn" onClick={() => this.emit(Event_Type.filterBtn, 'all')}>
+                所有
+              </Button>
+              <Button id="undone" className="filterBtn" onClick={() => this.emit(Event_Type.filterBtn, 'undone')}>
+                未完成
+              </Button>
+              <Button id="done" className="filterBtn" onClick={() => this.emit(Event_Type.filterBtn, 'done')}>
+                已完成
+              </Button>
             </Flow>
           </Flow>
 
@@ -53,6 +63,7 @@ class View extends MyEventTarget {
   leafer: Leafer
   todoWrapper: Flow
   checkAll: Flow
+  remain: Text
 
   renderList(todoList: Todo[]) {
     const todoUi = todoList.map(item => (
@@ -80,6 +91,7 @@ class View extends MyEventTarget {
     const bool = stats.total === stats.done
 
     this.checkAll.data.update(bool)
+    this.remain.set({ text: `剩余 ${stats.total - stats.done} 个` })
   }
 }
 

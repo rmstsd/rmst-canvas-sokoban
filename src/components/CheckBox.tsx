@@ -8,11 +8,11 @@ interface CheckBoxProps {
 
 export default function CheckBox(props: CheckBoxProps) {
   const { defaultValue, onChange } = props
-  const state = { value: defaultValue }
 
-  const Ui: Flow = (
+  const checkIcon = <Rect width={10} height={10} fill="#555"></Rect>
+
+  const ui: Flow = (
     <Flow
-      id="checkWrapper"
       cursor="pointer"
       width={20}
       height={20}
@@ -21,27 +21,25 @@ export default function CheckBox(props: CheckBoxProps) {
       fill="transparent"
       event={{
         [PointerEvent.CLICK]: evt => {
-          onChange?.(!state.value)
+          const nb = !ui.data.value
+          update(nb)
+          onChange?.(nb)
         }
       }}
-    >
-      {state.value ? <CheckIcon /> : null}
-    </Flow>
+    ></Flow>
   )
 
-  const updateUi = (value: boolean) => {
-    state.value = value
+  ui.data = { update, value: defaultValue }
 
-    Ui.removeAll()
+  update(ui.data.value)
+  function update(bool) {
+    ui.data.value = bool
+    ui.removeAll()
 
-    if (value) {
-      Ui.add(<CheckIcon />)
+    if (bool) {
+      ui.add(checkIcon)
     }
   }
 
-  return { updateUi, Ui }
-}
-
-const CheckIcon = () => {
-  return <Rect width={10} height={10} fill="#555"></Rect>
+  return ui
 }

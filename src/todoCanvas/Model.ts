@@ -1,11 +1,39 @@
+let id = 1
 class Model {
   todoList: Todo[] = [
-    { id: 'd84aa47f-8a4f-4942-9e55-ec6e47ca757d', content: 'ecbd10fe-b626-4160-aa86-f7e69b6c88ea', done: false },
-    { id: '22fa7e02-9793-477a-9fc5-da0d5fafaa3b', content: 'c0928158-632b-4674-b4de-3e584bc3661f', done: false }
+    { id: '3', content: '3333', done: true },
+    { id: '4', content: '4444', done: true },
+    { id: '5', content: '5555', done: true },
+    { id: '6', content: '6666', done: false },
+    { id: '7', content: '7777', done: false }
   ]
 
   addTodo(content: Todo['content']) {
-    this.todoList.push({ id: crypto.randomUUID(), content, done: false })
+    const _id = String(id++)
+    this.todoList.push({ id: _id, content: _id.repeat(4), done: false })
+
+    console.log(this.todoList)
+  }
+
+  removeTodo(id: Todo['id']) {
+    const index = this.todoList.findIndex(todo => todo.id === id)
+    if (index !== -1) {
+      this.todoList.splice(index, 1)
+    }
+  }
+
+  getCount() {
+    const stats = { unDone: 0, done: 0, total: this.todoList.length }
+
+    for (let todo of this.todoList) {
+      if (todo.done) {
+        stats.done++
+      } else {
+        stats.unDone++
+      }
+    }
+
+    return stats
   }
 }
 

@@ -7,7 +7,10 @@ import CheckBox from '@/components/CheckBox'
 
 export enum Event_Type {
   addItem = 'addItem',
-  toggleCheckItem = 'toggleCheckItem'
+  removeItem = 'removeItem',
+  toggleCheckItem = 'toggleCheckItem',
+
+  toggleCheckAll = 'toggleCheckAll'
 }
 
 class View extends MyEventTarget {
@@ -17,14 +20,8 @@ class View extends MyEventTarget {
     this.leafer = new Leafer({ view: root })
 
     const App = () => {
-      const cb = CheckBox({
-        defaultValue: false,
-        onChange: bool => {
-          console.log(bool)
-
-          cb.updateUi(bool)
-        }
-      })
+      const checkAll = <CheckBox onChange={bool => this.emit(Event_Type.toggleCheckAll, bool)} />
+      this.checkAll = checkAll
 
       return (
         <Flow flow="y" padding={30}>
@@ -34,7 +31,7 @@ class View extends MyEventTarget {
             </Box>
 
             <Flow flowAlign="center" gap={10}>
-              {cb.Ui}
+              {checkAll}
               <Text text="剩余 3 个"></Text>
               <Button>所有</Button>
               <Button>未完成</Button>
@@ -55,28 +52,14 @@ class View extends MyEventTarget {
 
   leafer: Leafer
   todoWrapper: Flow
+  checkAll: Flow
 
   renderList(todoList: Todo[]) {
     const todoUi = todoList.map(item => (
       <Flow id={item.id} flowAlign="center" gap={10}>
-        <Flow
-          id="checkWrapper"
-          cursor="pointer"
-          width={20}
-          height={20}
-          flowAlign="center"
-          stroke="#333"
-          fill="transparent"
-          event={{
-            [PointerEvent.CLICK]: evt => {
-              this.emit(Event_Type.toggleCheckItem, item)
-            }
-          }}
-        >
-          {item.done ? <CheckIcon /> : null}
-        </Flow>
-
-        <Text id="content" text={item.content}></Text>
+        <CheckBox defaultValue={item.done} onChange={() => this.emit(Event_Type.toggleCheckItem, item)} />
+        <Text id="content" text={item.content} textDecoration={item.done ? 'delete' : undefined}></Text>
+        <Button onClick={() => this.emit(Event_Type.removeItem, item)}>删除</Button>
       </Flow>
     ))
 
@@ -87,17 +70,17 @@ class View extends MyEventTarget {
   renderItemDone(item: Todo) {
     const itemUi = this.todoWrapper.findId(item.id)
     if (item.done) {
-      itemUi.findId('checkWrapper').add(<CheckIcon />)
       itemUi.findId('content').set({ textDecoration: 'delete' })
     } else {
-      ;(itemUi.findId('checkWrapper') as Flow).removeAll()
       itemUi.findId('content').set({ textDecoration: undefined })
     }
+  }
+
+  renderCheckAll(stats) {
+    const bool = stats.total === stats.done
+
+    this.checkAll.data.update(bool)
   }
 }
 
 export default View
-
-const CheckIcon = () => {
-  return <Rect width={10} height={10} fill="#555"></Rect>
-}

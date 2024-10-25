@@ -1,16 +1,19 @@
-import { createEmptyMap, testMapData } from '@/testData'
 import { CellType, MapData } from '@/type'
+import { Leafer } from 'leafer-ui'
+import GameMap from './_class'
 
-class Edit {
+class EditStore {
+  constructor(private leafer: Leafer) {}
   setCellType = (c: CellType) => {
     this.cellType = c
   }
 
   cellType: CellType = CellType.Floor
-  mapData: MapData = structuredClone(createEmptyMap()) as MapData
+  gameMap: GameMap
 
   addCell = (rowIndex: number, colIndex: number) => {
-    const { mapData, cellType } = this
+    const { gameMap: gameData, cellType } = this
+    const { mapData } = gameData
 
     const fillCell = (value: CellType) => {
       mapData.bgMap[rowIndex][colIndex] ??= { id: crypto.randomUUID(), type: CellType.Floor }
@@ -51,6 +54,4 @@ class Edit {
   // }
 }
 
-const editStore = new Edit()
-
-export default editStore
+export default EditStore

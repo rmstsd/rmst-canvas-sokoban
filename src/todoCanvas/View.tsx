@@ -93,6 +93,15 @@ class View extends MyEventTarget {
     this.checkAll.data.update(bool)
     this.remain.set({ text: `剩余 ${stats.total - stats.done} 个` })
   }
+
+  renderFilterBtn(filter: FilterType) {
+    const btns = this.leafer.find('.filterBtn')
+    btns.forEach(btn => {
+      btn.set({ fill: 'blue' })
+    })
+    const btn = this.leafer.findId(filter)
+    btn.set({ fill: 'green' })
+  }
 }
 
 export default View

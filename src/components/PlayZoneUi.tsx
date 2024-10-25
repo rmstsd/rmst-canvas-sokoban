@@ -7,12 +7,13 @@ import crateSheet1 from '@/images/crate-sheet1.jpg'
 import dropPoint from '@/images/drop-point.png'
 import playerImage from '@/images/player.png'
 import { cellSize } from '@/constant'
-import { CellType } from '@/type'
+import { CellType, MapData } from '@/type'
 import { Flow } from '@leafer-in/flow'
-import { gameStore } from '@/store/store'
-import editStore from '@/store/edit'
+import { EditContext } from '@/store/store'
 
 const BgMapUi = ({ bgMap }) => {
+  console.log(EditContext.value)
+
   const renderCellElement = (cell): IUI => {
     if (!cell) {
       return <Rect fill="#eee" width={cellSize} height={cellSize} />
@@ -45,8 +46,6 @@ const BgMapUi = ({ bgMap }) => {
                   event={{
                     [PointerEvent.MOVE]: evt => {
                       if (evt.pressure) {
-                        editStore.addCell(rowIndex, colIndex)
-
                         cellElement.remove()
                         box.add(renderCellElement(row[colIndex]))
                       }
@@ -96,13 +95,13 @@ const PlayerUi = ({ player }) => (
   />
 )
 
-const PlayZoneUi = () => {
+const PlayZoneUi = ({ mapData }: { mapData: MapData }) => {
   return (
-    <Box>
-      <BgMapUi bgMap={editStore.mapData.bgMap} />
-      <TargetsUi targets={editStore.mapData.targets} />
-      <BoxesUi boxes={editStore.mapData.boxes} />
-      {/* <PlayerUi player={editStore.mapData.player} /> */}
+    <Box id="playZoneUi">
+      <BgMapUi bgMap={mapData.bgMap} />
+      <TargetsUi targets={mapData.targets} />
+      <BoxesUi boxes={mapData.boxes} />
+      <PlayerUi player={mapData.player} />
     </Box>
   )
 }

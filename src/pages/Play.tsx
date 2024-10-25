@@ -2,25 +2,18 @@ import Button from '@/components/Button'
 import { Flow } from '@leafer-in/flow'
 import { Box, Text } from 'leafer-ui'
 import Edit from './Edit'
-import { gameStore } from '@/store/store'
 import PlayZoneUi from '@/components/PlayZoneUi'
+import GameStore from '@/store/store'
 
-const CtrlUi = () => {
+const CtrlUi = ({ gameStore }) => {
   return (
     <Flow x={100} y={100}>
-      <Box id="prev-level" x={100} y={100} fill="#FF4B4B" cornerRadius={20}>
-        <Text text="上一关" fill="black" padding={[10, 20]} />
-      </Box>
-      <Text id="level" fontSize={16} text="0" fill="black" padding={[10, 20]} />
-      <Box id="next-level" x={100} y={100} fill="#FF4B4B" cornerRadius={20}>
-        <Text text="下一关" fill="black" padding={[10, 20]} />
-      </Box>
+      <Button id="prev-level">上一关</Button>
+      <Text id="level" fontSize={16} text="当前关卡：1" fill="black" padding={[10, 20]} />
+      <Button id="next-level">下一关</Button>
 
       <Button
-        onClick={() => {
-          const ed = <Edit />
-          gameStore.leafer.add(ed)
-        }}
+        onClick={() => gameStore.editMap()}
       >
         编辑地图
       </Button>
@@ -28,11 +21,11 @@ const CtrlUi = () => {
   )
 }
 
-const Play = () => {
+const Play = ({ gameStore }: { gameStore: GameStore }) => {
   return (
     <Flow flow="y">
-      <CtrlUi />
-      <PlayZoneUi />
+      <CtrlUi gameStore={gameStore} />
+      <PlayZoneUi mapData={gameStore.gameMap.mapData} />
     </Flow>
   )
 }

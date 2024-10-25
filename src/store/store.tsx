@@ -1,36 +1,55 @@
 import { calcPositionMap, directionKeyboards } from './position'
-import { CellType, MapData, Position } from '../type'
-import { gameLevels, testMapData } from '../testData'
+import { MapData, Position } from '../type'
+import { gameLevels } from '../testData'
 import GameMap from './_class'
 
-import { Box, Event, Image, Leafer, PointerEvent } from 'leafer-ui'
-import { Flow } from '@leafer-in/flow'
-
-import floorImage from '../images/floor1-sheet0.png'
-import wallImage from '../images/wall-sheet.jpg'
-import crateSheet0 from '../images/crate-sheet0.jpg'
-import crateSheet1 from '../images/crate-sheet1.jpg'
-import dropPoint from '../images/drop-point.png'
-import playerImage from '../images/player.png'
+import { Leafer } from 'leafer-ui'
 
 import { cellSize } from '../constant'
+import Play from '@/pages/Play'
+import WonUi from '@/components/WonUi'
+import Edit from '@/pages/Edit'
+import editStore from './editStore'
+import EditStore from './editStore'
+import { createContext } from '@/utils'
+
+export const EditContext = createContext()
 
 class GameStore {
-  constructor() {}
+  constructor(private leafer: Leafer) {}
 
   gameMap: GameMap
-
-  leafer: Leafer
 
   level = 0
   gameLevels = structuredClone(gameLevels) as MapData[]
 
   initLoad() {
+    document.addEventListener('keydown', this.keydown)
+
     this.gameMap = new GameMap(this.gameLevels[this.level])
 
-    document.onkeydown = evt => {
-      gameStore.movePlayer(evt)
-    }
+    const gameUi = Play({ gameStore: this })
+    this.leafer.add(gameUi)
+  }
+
+  destroy() {
+    document.removeEventListener('keydown', this.keydown)
+  }
+
+  keydown = (evt: KeyboardEvent) => {
+    this.movePlayer(evt)
+  }
+
+  editMap() {
+    const editStore = new EditStore(this.leafer)
+    editStore.gameMap = new GameMap(structuredClone(this.gameMap.mapData))
+    const editUi = (
+      <EditContext.Provider value={editStore}>
+        <Edit editStore={editStore} />
+      </EditContext.Provider>
+    )
+
+    this.leafer.add(editUi)
   }
 
   updateBoxUi(box: Position) {
@@ -39,14 +58,6 @@ class GameStore {
 
   updatePlayerUi(player: Position) {
     this.leafer.findId(`player`).set({ x: player.x * cellSize, y: player.y * cellSize })
-  }
-
-  renderGame() {
-    document.onkeydown = evt => {
-      this.movePlayer(evt)
-    }
-
-    this.leafer.removeAll()
   }
 
   movePlayer(evt: KeyboardEvent) {
@@ -88,10 +99,12 @@ class GameStore {
 
     if (this.gameMap.isWon()) {
       console.log('won')
+
+      const playZoneUi = this.leafer.findId('playZoneUi')
+      const wonUi = <WonUi width={playZoneUi.width} height={playZoneUi.height}></WonUi>
+      playZoneUi.add(wonUi)
     }
   }
 }
 
 export default GameStore
-
-export const gameStore = new GameStore()

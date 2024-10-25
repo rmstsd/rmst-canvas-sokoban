@@ -2,7 +2,7 @@ import Model from './Model'
 import View, { Event_Type } from './View'
 
 class Controller {
-  constructor(public model: Model, public view: View) {
+  constructor(private model: Model, private view: View) {
     view.on(Event_Type.addItem, this.addItem.bind(this))
     view.on(Event_Type.toggleCheckItem, this.doneItem.bind(this))
     view.on(Event_Type.removeItem, this.removeItem.bind(this))
@@ -17,6 +17,7 @@ class Controller {
     console.log('filterType', type)
     this.filterType = type
     this.filter()
+    this.view.renderFilterBtn(type)
   }
 
   addItem(content: Todo['content']) {
